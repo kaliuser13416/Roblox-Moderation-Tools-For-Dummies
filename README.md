@@ -1,7 +1,2 @@
-This is a very easy to use client that uses serval of Roblox's APIs. Its main purpose is to make it easier to find users and bad actors that should be moderated. The 1.0.0 version reqires a Roblox API key. This key needed to be placed into the text file called, "API_KEY.txt"
-On statup the program will ask prompt weather or not you are looking to find users or assets. After this you will be prompted for the main program. Its set up so that it will loop until you enter, "Done" Then it will output a text file called 'AssetsIDs_to_Review.txt' or 'UserIDs_to_Review.txt'
-Requirements:
-  Python 3.9.X
-    requests
-    json
-    time
+This is a very easy to use client that uses serval of Roblox's APIs. Its main purpose is to make it easier to find users and bad actors that should be moderated. On statup the program will ask prompt weather or not you want to check for ban status. Its set up so that mina will repete until you enter, "Done" Then it will output either check user IDs if thier banned, or save a list of user IDs. You will need to install tqdm with pip before running the script.
+Requirements Python 3.10, and tqdm. 
