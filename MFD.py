@@ -1,119 +1,107 @@
+from tqdm import tqdm
 import requests
 import json
 import time
+import sys
+import csv
 
-userList = []
-assetList = []
-repeat_users = True
-repeat_assets = True
-repeat = True
-index = 0
-number = 0
-text_file = open("API_KEY.txt", "r")
-API_KEY = text_file.read()
-text_file.close()
-headers = {"Content-Type": "application/json", "x-api-key": API_KEY}
+def Write_CSV(csv_data):
+    with open('User_Data.csv', 'w', newline='', encoding='utf-8') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerows(csv_data)
+    csvfile.close()
 
-print("welcome to the moderation for dummies toolkit. What do you want to do? ")
-while repeat is not False:
-    Ans = str(input("(users or assets): " ));
-    if Ans == "users":
-        repeat_assets = False
-        repeat = False
-    elif Ans == "assets":
-        repeat_users = False
-        repeat = False
-    else:
-        print("invalid input")
+def Write_txt(data):
+    textfile = open("uniqueIDs.txt", "w")
+    for x in data:
+        print(x, file=textfile)
 
-while repeat_users is not False:
-    command = str(input("(Group_Finder, Friend_Finder, Done, help): " ));
-    if command == "Group_Finder":
-        groupId = int(input("groupId: " ));
-        next_page_cursor = ""
-        while next_page_cursor is not None:
-            URL = f"https://groups.roblox.com/v1/groups/{groupId}/users?sortOrder=Asc&limit=100&Cursor={next_page_cursor}"
-            response = requests.get(URL)
-            data = response.json()
-            for member_data in data['data']:
-                print(member_data['user']['userId'])
-                userList.append(member_data['user']['userId'])
-            next_page_cursor = data['nextPageCursor']
-    elif command == "Friend_Finder":
-        userId = int(input("userId: " ));
-        URL = f"https://friends.roblox.com/v1/users/{userId}/friends/"
+def V1_User(uniqueIDs):
+    number = 0
+    for i in tqdm (range(len(uniqueIDs)), desc="User Data", unit=" Ids"):
+        userId = uniqueIDs[i]
+        URL = f"https://users.roblox.com/v1/users/{userId}"
         response = requests.get(URL)
-        data = response.json()
-        for  member_data in data['data']:
-            print(member_data['id'])
-            userList.append(member_data['id'])
-    elif command == "Done":
-        #Gets rid of duplicate UserIds.
-        uniqueIDs = list(set(userList))
-        #Checks to see if user is Banned. API v1 data can be out of date.
-        print("Checking to see if users are already banned.")
-        time.sleep(1)
-        for x in uniqueIDs:
-            userId = uniqueIDs[index]
-            URL = f"https://apis.roblox.com/cloud/v2/users/{userId}"
-            response = requests.get(URL, headers=headers)
-            print("Checking user", uniqueIDs[index])
-            if response.status_code == 200:
-                with open("UserIDs_to_Review.txt", "a") as f:
-                    print(uniqueIDs[index], file=f)
-                    number = number + 1
-                f.close()
-            index = index + 1
-        print("There are", number, "users to review" )
-    elif command == "help":
-        print("Group_Finder, finds the userIds of the users in a group")
-        print("Friend_Finder, finds the userIds of the users who are friends with annother user")
-        print("Done, ends the collection loop and processes the userIds")
-        print("")
-    else:
-        print("invalid input")
-
-while repeat_assets is not False:
-    command = str(input("(Group_Store, Clothes_Finder, Done, help): " ));
-    if command == "Group_Store":
-        groupId = int(input("groupId: " ));
-        nextPageCursor = ""
-        while nextPageCursor is not None:
-            URL = f"https://catalog.roblox.com/v1/search/items/details?Category=3&CreatorType=2&CreatorTargetId={groupId}&Limit=30&Cursor={nextPageCursor}"
-            response = requests.get(URL)
-            data = response.json()
-            for member_data in data['data']:
-                assetList.append(member_data['id'])
-                print(member_data['id'])
-            nextPageCursor = data['nextPageCursor']
-    elif command == "Clothes_Finder":
-        userId = int(input("userId: " ));
-        AssetTypes = "CLASSIC_TSHIRT,MODEL,CLASSIC_SHIRT,CLASSIC_PANTS,FACE,DECAL" #Can change this. I just think that most bypassed items are one of these.
-        URL = f"https://apis.roblox.com/cloud/v2/users/{userId}/inventory-items?maxPageSize=100&filter=inventoryItemAssetTypes={AssetTypes}"
-        response = requests.get(URL, headers=headers)
         if response.status_code == 200:
-            data = json.loads(response.text)
-            inventory = data['inventoryItems']
-            for member_data in inventory:
-                print(member_data['assetDetails']['assetId'])
-                assetList.append(member_data['assetDetails']['assetId'])
-        elif response.status_code == 403:
-            print("can-view-inventory = false")
+            data = response.json()
+            ban_stat = data["isBanned"]
+            if ban_stat == False:
+                discp_str = str(data["description"])
+                if discp_str == "":
+                    discp_str = "null"
+                discp_str = discp_str.replace("\n"," ")
+                csv_data.append([data["id"], data["name"], data["displayName"], discp_str])
+                number = number + 1
+        elif response.status_code == 429:
+            time.sleep(60)
         else:
-            print("IDK", response)
-    elif command == "Done":
-        #Gets rid of duplicate asset Ids.
-        uniqueIDs = list(set(assetList))
-        for x in uniqueIDs:
-            with open("AssetsIDs_to_Review.txt", "a") as f:
-                print(uniqueIDs[index], file=f)
-            f.close()
-            index = index + 1
-        print("There are", len(uniqueIDs), "assets to review" )
-    elif command == "help":
-        print("Group_Finder, finds the userIds of the users in a group")
-        print("Friend_Finder, finds the userIds of the users who are friends with annother user")
-        print("Done, ends the collection loop and processes the asset Ids")
-        print("")
+            print("http error {response.status_code}")
+        time.sleep(0.1)
+    print(f"There are {number} users to review" )
+    Write_CSV(csv_data)
+
+def Friend_Finder():
+    userId = int(input("userId: " ));
+    friends_URL = f"https://friends.roblox.com/v1/users/{userId}/friends"
+    response = requests.get(friends_URL)
+    if response.status_code == 200:
+        friends_data = response.json()
+        for member_data in friends_data['data']:
+            all_IDs.append(member_data["id"])
+    elif response.status_code == 429:
+        print("too many requests")
     else:
-        print("invalid input")
+        print(f"http error: {response.status_code} for {friends_URL}")
+
+def Group_Finder(groupSize, groupId):
+    temp = 0
+    temp = f'{(groupSize / 100):.0f}'
+    next_page_cursor = ""
+    for i in tqdm (range(int(temp)), desc="Geting UserIds", unit=" 100 Ids"):
+        URL = f"https://groups.roblox.com/v1/groups/{groupId}/users?sortOrder=Asc&limit=100&Cursor={next_page_cursor}"
+        response = requests.get(URL)
+        groups_data = response.json()
+        for member_data in groups_data['data']:
+            all_IDs.append(member_data['user']['userId'])
+        next_page_cursor = groups_data['nextPageCursor']
+
+def basic_info(groupId):
+    URL = f"https://groups.roblox.com/v1/groups/{groupId}/"
+    response = requests.get(URL)
+    data = response.json()
+    group_memberCount = data["memberCount"]
+    print(f"member count = {group_memberCount}")
+    return group_memberCount
+
+def main():
+    repeat = True
+    while repeat is not False:
+        command = str(input("(Group_Finder, Friend_Finder, Done, help): " ));
+        if command == "Group_Finder":
+            groupId = int(input("groupId: " ));
+            Group_Finder(basic_info(groupId), groupId)
+        elif command == "Friend_Finder":
+            Friend_Finder()
+        elif command == "Done":
+            repeat = False
+            uniqueIDs = list(set(all_IDs))
+            if Ban_status == "Y":
+                V1_User(uniqueIDs)
+            else:
+                Write_txt(uniqueIDs)
+        elif command == "help":
+            print("Group_Finder, finds the userIds of all of the users in a group")
+            print("Friend_Finder, finds the userIds of the users who are friends with annother user")
+            print("Done, ends the collection loop and processes the userIds")
+            print("")
+        else:
+            print("invalid input")
+
+if __name__ == '__main__':
+    user_Json = {}
+    user_List = []
+    all_IDs = []
+    csv_data = []
+    print("Do you want to run the ban check when processing User IDs? It is slow, 5 IDs / Second")
+    Ban_status = input("(Y / n): ")
+    main()
