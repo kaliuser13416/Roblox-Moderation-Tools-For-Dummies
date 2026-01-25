@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MFD Web</title>
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #ffffff5d;
+        }
+    </style>
+</head>
+<body>
+	<p><a href="/">Home</a>   |   <a href="/About">About</a>   |   <a href="/stats">Stats</a>   |   <a href="/analysis">Sentiment Analysis</a>   |   <a href="/review">Review Users</a>   |   <a href="/audited">Audit Users</a>   |   <a href="/admin">Admin</a></p>
+    <h2>Sentiment Analysis.</h2>
+    <p>On this page you can see the results of the Sentiment Analysis and see how accurate it is.</p>
+    <table>
+        <tr>
+            <th>User description</th>
+            <th>Sentiment</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <th>{{ user["user_description"] }}</th>
+            <th>{{ user["Sentiment"] }}</th>
+        </tr>
+        {% endfor %}
+    </table>
+
+</body>
+</html>

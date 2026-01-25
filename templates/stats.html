@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MFD Web</title>
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #ffffff5d;
+        }
+
+    </style>
+</head>
+<body>
+	<p><a href="/">Home</a>   |   <a href="/About">About</a>   |   <a href="/stats">Stats</a>   |   <a href="/analysis">Sentiment Analysis</a>   |   <a href="/review">Review Users</a>   |   <a href="/audited">Audit Users</a>   |   <a href="/admin">Admin</a></p>
+    <h2>Basic stats:</h2>
+    <ul>
+        <li>Total Users: {{ stats["total_users"] }}</li>
+        <li>Users Banned: {{ stats["users_banned"] }}</li>
+        <li>Users Audited: {{ stats["users_audited"] }}</li>
+    </ul>
+	<h2>Data collected:</h2>
+    <li id="MainDB">Main DB:</li><br>
+    <table>
+        <tr>
+            <th>User ID</th>
+            <th>banned</th>
+            <th>Username</th>
+            <th>Display Name</th>
+            <th>Description</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <th>{{ user[0] }}</th>
+            <th>{{ user[1] }}</th>
+            <th>{{ user[2] }}</th>
+            <th>{{ user[3] }}</th>
+            <th>{{ user[4] }}</th>
+        </tr>
+        {% endfor %}
+    </table><br>
+
+    <div class="pagination">
+        {% if page > 1 %}
+            <a href="{{ url_for('stats', page=page-1) }}">&laquo; Prev</a>
+        {% endif %}
+
+        {% for p in range(1, total_pages + 1) %}
+            {% if p == page %}
+                <span class="current">{{ p }}</span>
+            {% else %}
+                <a href="{{ url_for('stats', page=p) }}">{{ p }}</a>
+            {% endif %}
+        {% endfor %}    
+
+        {% if page < total_pages %}
+            <a href="{{ url_for('stats', page=page+1) }}">Next &raquo;</a>
+        {% endif %}
+    </div>
+
+</body>
+</html>

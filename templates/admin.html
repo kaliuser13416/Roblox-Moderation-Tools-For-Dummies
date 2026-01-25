@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>MFD Web</title>
+        <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+        <h1>Admin Page</h1>
+	<p><a href="/">Home</a>   |   <a href="/About">About</a>   |   <a href="/stats">Stats</a>   |   <a href="/analysis">Sentiment Analysis</a>   |   <a href="/review">Review Users</a>   |   <a href="/audited">Audit Users</a>   |   <a href="/admin">Admin</a></p>
+        <p>This this page you make changes to the config file.</p>
+        
+        
+
+        <p>Get Roblox User's Profile Picture:</p>
+        <button id="Get_Images" type="button" onclick="get_images()">Button</button><br>
+        <p id="pressed"></p>
+        
+        <p>Current Config:</p>
+        <ul>
+            <li>Web IP: {{ config["WEB_IP"] }}</li>
+            <li>Web Port: {{ config["WEB_PORT"] }}</li>
+            <li>Log Level: {{ config["LOG_LEVEL"] }}</li>
+        </ul>
+
+        <p>Current Items in BlackList:</p>
+        <th>{{ config["BlackList"] }}</th>
+        
+
+        <p>(The Edit Config part of the page does not currently work. If you need to make changes edit the config.json file directly)</p>
+        <p>Edit Config.</p>        
+        <form id="new_config">
+            <p>New Web IP</p>
+            <input type="text" id="Web_IP" name="fname">
+            <p>New Web Port</p>
+            <input type="text" id="Web_Port" name="fname">
+            <p>New Log Level</p>
+            <input type="text" id="Log_Level" name="fname"><br>
+            <label for="CMD">New BlackList:</label><br>
+            <textarea id="BlackList"></textarea><br><br>
+            <input type="submit" value="submit">
+    </body>
+    <script>
+        function get_images(USER_ID) {
+            temp_json = {
+                "UserID": USER_ID, 
+                "value": "Suspicious"
+            }
+            document.getElementById("pressed").innerHTML = 'Image update issued. Please wait on this page.';
+            postDB(JSON.stringify(temp_json))
+        }
+
+        function postDB(json_obj){
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/get-images");
+            xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8")
+
+            xhr.onload = () => {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    console.log(JSON.parse(xhr.responseText));
+                    document.getElementById("pressed").innerHTML = 'Done!';
+                } else {
+                    console.log(`Error: ${xhr.status}`);
+                    document.getElementById("pressed").innerHTML = 'There was an error!!';
+                }
+            };
+            xhr.send(json_obj);
+        }
+
+        document.getElementById('new_config').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var BlackList = this.BlackList.value;
+            
+            var back_list = BlackList.split(",");
+
+            console.log(BlackList);
+            let temp_json = ({
+                "Web_IP": this.Web_IP.value,
+                "Web_Port": this.Web_Port.value,
+                "Log_Level": this.Log_Level.value,
+                "BlackList": back_list
+            });
+            var json_sring = JSON.stringify(temp_json);
+            console.log(json_sring);
+            postAPI(json_sring)
+            this.reset();
+        });
+
+        function postAPI(json_obj){
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/update-config");
+            xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8")
+            xhr.onload = () => {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    console.log(JSON.parse(xhr.responseText));
+                } else {
+                    console.log(`Error: ${xhr.status}`);
+                }
+            };
+            xhr.send(json_obj);
+        }
+
+    </script>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MFD Web</title>
+	<link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+</head>
+<body>
+	<h1>MFD Web</h1>
+	<p><a href="/">Home</a>   |   <a href="/About">About</a>   |   <a href="/stats">Stats</a>   |   <a href="/analysis">Sentiment Analysis</a>   |   <a href="/review">Review Users</a>   |   <a href="/audited">Audit Users</a>   |   <a href="/admin">Admin</a></p>
+	<p>Remember to update the database (DB) before visting the Stats or Sentiment Analysis pages (After subminting a UserID or GroupID).</p>
+    <h2>Input UserID</h2>
+	<form id="FriendFinder">
+        <input type="text" id="UserID" name="fname">
+        <input type="submit" value="submit">
+    </form>
+    <h2>Input GroupID</h2>
+	<form id="GroupFinder">
+        <input type="text" id="GroupID" name="fname">
+        <input type="submit" value="submit">
+    </form>
+    <h2>Update DB</h2>
+	<form id="UpdateDB">
+        <input type="submit" value="submit">
+    </form>
+	<p id="pressed"><p>
+
+</body>
+<script>
+	document.getElementById('FriendFinder').addEventListener('submit', function(e) {
+		e.preventDefault();
+		let temp_json = ({
+			"user_id": this.UserID.value,
+		});
+		var json_sring = JSON.stringify(temp_json);
+		postFriend(json_sring)
+		this.reset();
+	});
+
+	function postFriend(data){
+		fetch("/Friend-Finder", {
+			method: "POST",
+			body: data,
+			headers: {
+				"Content-type": "application/json; charset=UTF-8"
+			}
+		});
+	}
+	
+	document.getElementById('GroupFinder').addEventListener('submit', function(e) {
+		e.preventDefault();
+		let temp_json = ({
+			"GroupID": this.GroupID.value,
+		});
+		var json_sring = JSON.stringify(temp_json);
+		postGroup(json_sring)
+		this.reset();
+	});
+
+	function postGroup(data){
+		fetch("/Group-Finder", {
+			method: "POST",
+			body: data,
+			headers: {
+				"Content-type": "application/json; charset=UTF-8"
+			}
+		});
+	}
+	
+	document.getElementById('UpdateDB').addEventListener('submit', function(e) {
+		e.preventDefault();
+		document.getElementById("pressed").innerHTML = 'Datebase update issued. Please wait on this page.';
+		postDB()
+		this.reset();
+		
+	});
+
+	function postDB(){
+		const xhr = new XMLHttpRequest();
+		xhr.open("POST", "/update-DB");
+		xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8")
+
+		var temp_json = ({
+			"feild": "value"
+		});
+		var json_sring = JSON.stringify(temp_json);
+
+		xhr.onload = () => {
+		if (xhr.readyState == 4 && xhr.status == 200) {
+			console.log(JSON.parse(xhr.responseText));
+			document.getElementById("pressed").innerHTML = 'Datebase updated.';
+		} else {
+			console.log(`Error: ${xhr.status}`);
+			document.getElementById("pressed").innerHTML = 'Datebase updat failed.';
+		}
+		};
+		xhr.send(json_sring);
+	}
+
+</script> 
+</html>

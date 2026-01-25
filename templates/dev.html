@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>MFD Web</title>
+        <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+        <h1>MFD Web</h1>
+        <h2>Dev</h2>
+	<p><a href="/">Home</a>   |   <a href="/About">About</a>   |   <a href="/stats">Stats</a>   |   <a href="/analysis">Sentiment Analysis</a>   |   <a href="/review">Review Users</a>   |   <a href="/audited">Audit Users</a>   |   <a href="/admin">Admin</a></p>
+        <p>You're not supposed to be here.</p>
+        <p>I made this page to easily run SQLite commands. If you don't know what you're doing, leave. You can very easily corrupt, modify, or delete the entirety of the database.</p>
+        <div class="container">
+            <p>DB management</p>
+            <div class="input-group">
+                <label for="CMD">Enter prompt:</label><br>
+                <textarea id="CMD"></textarea>
+            </div>
+            <br>
+            <div class="button-group">
+                <button onclick="post()">SEND IT!</button><br><br>
+            </div><br>
+            <p id="http-code"></p>
+            <div >
+                <ul id="result"></ul>
+            </div>
+        </div>
+    </body>
+    <script>
+        function post(){
+            clearData()
+            var command = document.getElementById('CMD').value.trim();
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/dev-payload");
+            xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8")
+            var temp_json = ({
+                "opt": "DB",
+                "payload": command
+            });
+            var json_sring = JSON.stringify(temp_json);
+
+            xhr.onload = () => {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                temp_data = JSON.parse(xhr.responseText)
+                console.log(temp_data);
+                http_code = temp_data[0];
+                results = temp_data[1];
+                document.getElementById("http-code").innerHTML = http_code;
+                const container = document.getElementById('result');
+                results.forEach(item => {
+                    const itemDiv = document.createElement('li');
+                    itemDiv.className = 'item';
+                    itemDiv.innerHTML = `
+                        ${item}
+                    `;
+                    container.appendChild(itemDiv);
+                });
+
+
+            } else {
+                console.log(`Error: ${xhr.status}`);
+                document.getElementById("result").innerHTML = `Error: ${xhr.status}`;
+            }
+            };
+            xhr.send(json_sring);
+        }
+        function clearData() {
+            let resultDiv = document.getElementById('result');
+            let http_code = document.getElementById('http-code');
+            resultDiv.innerHTML = '';
+            http_code.innerHTML = '';
+        }
+    </script>
+</html>

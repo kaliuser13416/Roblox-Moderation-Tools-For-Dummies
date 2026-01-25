@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MFD Web</title>
+	<link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+</head>
+<body>
+	<h1>MFD Web</h1>
+	<p><a href="/">Home</a>   |   <a href="/About">About</a>   |   <a href="/stats">Stats</a>   |   <a href="/analysis">Sentiment Analysis</a>   |   <a href="/review">Review Users</a>   |   <a href="/audited">Audit Users</a>   |   <a href="/admin">Admin</a></p>
+	<h2>About</h2>
+	<p>Hello. This is a project I have been working on for little while. This is a web portal for finding users and bad actors that should be moderated. It uses a number of Roblox's APIs to collect data. After submiting a UserID or GroupID remember to update the database (DB) before visting the Stats or Sentiment Analysis pages. This is mostly meant as a proof of concept. The stats page literally just dumps the database onto the page. - It also shows some basic stats. The Sentiment Analysis page runs Sentiment Analysis on the user description with a Sentiment Analysis model I trained awhile back."</p>
+	<h3>Useage</h3>
+	<p>The main useage is collecting users associated with a bad actor. This is done either by providing a GroupID or thier UserID. Providing the GroupID collects all the users in that group. Providing the UserID collects all the connections of that user.</p>
+	<p>The UserID is the number in the url: https://www.roblox.com/users/1320922/profile/</p>
+	<p>The GroupID is the number in the url: https://www.roblox.com/communities/2658221/Lumber-Tycoon-2-Fans#!/about</p>
+	<p>Updating the database can take a long time. This is not becuase my code is bad, well some of it is. This is mainly becuase the API I use to collect the data for each user will rate limit me if I attempt to process 5 users per second. This is the same reason why getting to URLs of Roblox profile pictures also takes a long time.</p>
+	<h3>Limitations</h3>
+	<p>This tool was not disinged with multiple users using the tool at the same time. So at this point in time it is reccomneded that you do not use this tool with multiple users simultaneously.</p>
+	<h3>Issues</h3>
+	<p>There are not any issues I know of. If you enconter an issue / bug, make a issue post on <a href="https://github.com/kaliuser13416/Roblox-Moderation-Tools-For-Dummies/issues">GitHub</a>.</p>
+	<p>If you make a issue post please incude all errors from the log file that is created by the web server. It is located within the same directory of the 'web-server.py' file</p>
+</body>
+</html>
