@@ -1,10 +1,18 @@
 # Roblox-Moderation-Tools-For-Dummies  
 
-This is a very easy to use client that uses serval of Roblox's APIs. Its main purpose is to make it easier to find users and bad actors that should be moderated. On statup the program will ask prompt weather or not you want to check to see if users are banned. This is optional becuase it uses a different API that has a low rate limit. The 'ban checker' also gets the username, display name, and the description for each userID (if thier not banned).
+This project is for finding users and bad actors that should be moderated. It uses a number of Roblox's APIs to collect data. After submiting a UserID or GroupID remember to update the database (DB) before visting the Stats or Sentiment Analysis pages. This is mostly meant as a proof of concept. There are sill many flaws.
 
 ## Install
-Download MFD.py, Install tqdm, then run MFD.py
+Install the requirements from requirements.txt.
+Run python3, import nltk, and download 'punkt_tab' and 'stopwords':
+import nltk
+nltk.download('punkt_tab')
+nltk.download('stopwords')
 
-## Requirements
-Python 3.10+
- - tqdm
+After that, start the web server by running 'web_server.py' with python.
+
+## External Libraries
+Python 3
+ - flask
+ - requests
+ - nltk
