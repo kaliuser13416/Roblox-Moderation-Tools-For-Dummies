@@ -8,3 +8,4 @@ Download MFD.py, Install tqdm, then run MFD.py
 ## Requirements
 Python 3.10+
  - tqdm
+ - requests
