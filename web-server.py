@@ -283,7 +283,10 @@ def admin():
     global app_config
     blacklist_str = ""
     for I in BlackList:
-        blacklist_str = f"{I},{blacklist_str}"
+        if blacklist_str == "":
+            blacklist_str = I
+        else:
+            blacklist_str = f"{blacklist_str},{I}"
     blacklist_str = {
         "blacklist_str": blacklist_str
     }
