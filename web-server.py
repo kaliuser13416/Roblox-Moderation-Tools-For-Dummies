@@ -23,20 +23,20 @@ app = Flask(__name__)
 IDs_in_DB = []
 current_IDs = []
 PWD = os.getcwd()
+defualt_config = os.path.join(PWD, 'config.json')
 BlackList = []
 with open(os.path.join(PWD, 'sentiment_model.pkl'), 'rb') as f:
     model = pickle.load(f)
 
 # ---------------------- Load Config ------------------
 try:
-    with open(os.path.join(PWD, 'config.json'), mode='r', encoding="utf-8") as f:
+    with open(defualt_config, mode='r', encoding="utf-8") as f:
         app_config = json.load(f)
     LOG_LEVEL = str(app_config["LOG_LEVEL"]).upper()
     WEB_IP = str(app_config["WEB_IP"])
     WEB_PORT = int(app_config["WEB_PORT"])
     for item in app_config["BlackList"]:
         BlackList.append(item)
-
 except Exception as e:
     logging.error(f'Failed to load config: {e}')
     sys.exit(1)
@@ -243,15 +243,19 @@ def User_audit():
 def update_config():
     try:
         data = request.json
-        """
+        #logging.debug(json.dumps(data, ensure_ascii=False))
         new_config = {
-            "WEB_IP": (data.get('WEB_IP') or WEB_IP),
-            "WEB_PORT": (data.get('WEB_PORT') or WEB_PORT),
-            "LOG_LEVEL": (data.get('LOG_LEVEL') or LOG_LEVEL),
+            "WEB_IP": (data.get('Web_IP') or WEB_IP),
+            "WEB_PORT": (data.get('Web_Port') or WEB_PORT),
+            "LOG_LEVEL": (data.get('Log_Level') or LOG_LEVEL),
             "BlackList": (data.get('BlackList') or BlackList)
         }
-        """
-        logging.info(data)
+        logging.debug('NEW CONFIG::')
+        # print(new_config)
+
+        with open(defualt_config, 'w') as f:
+            pass
+            json.dump(new_config, f)
 
         http_code = 201
     except Exception as e:
@@ -277,7 +281,13 @@ def about():
 @app.route('/admin')
 def admin():
     global app_config
-    return render_template('admin.html', config=app_config)
+    blacklist_str = ""
+    for I in BlackList:
+        blacklist_str = f"{I},{blacklist_str}"
+    blacklist_str = {
+        "blacklist_str": blacklist_str
+    }
+    return render_template('admin.html', config=app_config, blacklist_str=blacklist_str)
 
 @app.route('/analysis')
 def analysis():
