@@ -9,9 +9,6 @@
         <h1>Admin Page</h1>
 	<p><a href="/">Home</a>   |   <a href="/About">About</a>   |   <a href="/stats">Stats</a>   |   <a href="/analysis">Sentiment Analysis</a>   |   <a href="/review">Review Users</a>   |   <a href="/audited">Audit Users</a>   |   <a href="/admin">Admin</a></p>
         <p>This this page you make changes to the config file.</p>
-        
-        
-
         <p>Get Roblox User's Profile Picture:</p>
         <button id="Get_Images" type="button" onclick="get_images()">Button</button><br>
         <p id="pressed"></p>
@@ -24,10 +21,7 @@
         </ul>
 
         <p>Current Items in BlackList:</p>
-        <th>{{ config["BlackList"] }}</th>
-        
-
-        <p>(The Edit Config part of the page does not currently work. If you need to make changes edit the config.json file directly)</p>
+        <th>{{ blacklist_str["blacklist_str"] }}</th>
         <p>Edit Config.</p>        
         <form id="new_config">
             <p>New Web IP</p>
